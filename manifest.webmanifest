@@ -1,6 +1,6 @@
 {
-  "name": "Mémo MSDGN — Entraînement",
-  "short_name": "Mémo MSDGN",
+  "name": "TEST Mémo MSDGN",
+  "short_name": "TEST MSDGN",
   "description": "Quiz d'entraînement MSDGN pour les Terminales STMG",
   "lang": "fr",
   "start_url": "./index.html",
