@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "genere_le": "2026-11-20",
+  "semaine": "2026-W47",
+  "bareme_version": "B1",
+  "equipes": [
+    {
+      "id": "renard",
+      "score": 120,
+      "actifs": 3,
+      "inscrits": 5
+    },
+    {
+      "id": "hibou",
+      "score": 96,
+      "actifs": 3,
+      "inscrits": 5
+    },
+    {
+      "id": "ours",
+      "score": 60,
+      "actifs": 2,
+      "inscrits": 5
+    },
+    {
+      "id": "requin",
+      "score": 18,
+      "actifs": 1,
+      "inscrits": 5
+    },
+    {
+      "id": "faucon",
+      "score": 144,
+      "actifs": 4,
+      "inscrits": 5
+    },
+    {
+      "id": "cerf",
+      "score": 324,
+      "actifs": 5,
+      "inscrits": 5
+    },
+    {
+      "id": "tortue",
+      "score": 40,
+      "actifs": 2,
+      "inscrits": 5
+    }
+  ],
+  "cumul": {
+    "renard": 210,
+    "hibou": 150,
+    "ours": 95,
+    "requin": 40,
+    "faucon": 300,
+    "cerf": 560,
+    "tortue": 70
+  },
+  "manches": [],
+  "challenge_fin": "2027-02-05",
+  "gagnante": ""
+}

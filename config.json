@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "phase": "base",
+  "version_application": "2.0",
+  "version_banque": "409q-v1",
+  "bareme_version": "B1",
+  "mis_a_jour_le": "2026-11-13",
+  "valide_jusqu_au": "2027-06-30",
+  "bareme": {
+    "points_par_format": {
+      "QCM": 10,
+      "VF": 10,
+      "TROUS": 12,
+      "QCM_MULTI": 15,
+      "ASSO": 15
+    },
+    "plafond_quotidien_bonnes_reponses": 15,
+    "plafond_hebdo_points": 450,
+    "bonus_serie": {
+      "3": 5,
+      "5": 10,
+      "10": 20
+    },
+    "seuil_actif": {
+      "bonnes_reponses": 20,
+      "jours_distincts": 2
+    },
+    "defi_du_jour": 10
+  },
+  "equipes": [
+    {
+      "id": "renard",
+      "nom": "Renard",
+      "couleur": "#D55E00",
+      "embleme": "renard",
+      "inscrits": 5
+    },
+    {
+      "id": "hibou",
+      "nom": "Hibou",
+      "couleur": "#0072B2",
+      "embleme": "hibou",
+      "inscrits": 5
+    },
+    {
+      "id": "ours",
+      "nom": "Ours",
+      "couleur": "#CC79A7",
+      "embleme": "ours",
+      "inscrits": 5
+    },
+    {
+      "id": "requin",
+      "nom": "Requin",
+      "couleur": "#56B4E9",
+      "embleme": "requin",
+      "inscrits": 5
+    },
+    {
+      "id": "faucon",
+      "nom": "Faucon",
+      "couleur": "#F0E442",
+      "embleme": "faucon",
+      "inscrits": 5
+    },
+    {
+      "id": "cerf",
+      "nom": "Cerf",
+      "couleur": "#009E73",
+      "embleme": "cerf",
+      "inscrits": 5
+    },
+    {
+      "id": "tortue",
+      "nom": "Tortue",
+      "couleur": "#E69F00",
+      "embleme": "tortue",
+      "inscrits": 5
+    }
+  ],
+  "codes_equipe": {
+    "089c05f7a64c7c0b": "renard",
+    "e593c3ccdb6e7738": "hibou",
+    "ae120863e2dbdb75": "ours",
+    "a1d2ff0b403a0d13": "requin",
+    "dd654cd65c06f57a": "faucon",
+    "fb28eef1d26c76ef": "cerf",
+    "d25b4fcd736eeaba": "tortue"
+  },
+  "codes_seance": [
+    {
+      "date": "2026-11-20",
+      "hash": "552bd60fddd010d3"
+    }
+  ],
+  "challenge_fin": "2027-02-05"
+}
