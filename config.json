@@ -1,10 +1,10 @@
 {
-  "schema": 1,
+  "schema": 2,
   "phase": "base",
-  "version_application": "2.0",
+  "version_application": "2.1",
   "version_banque": "409q-v1",
   "bareme_version": "B1",
-  "mis_a_jour_le": "2026-11-13",
+  "mis_a_jour_le": "2026-11-19",
   "valide_jusqu_au": "2027-06-30",
   "bareme": {
     "points_par_format": {
@@ -78,15 +78,30 @@
       "inscrits": 5
     }
   ],
-  "codes_equipe": {
-    "089c05f7a64c7c0b": "renard",
-    "e593c3ccdb6e7738": "hibou",
-    "ae120863e2dbdb75": "ours",
-    "a1d2ff0b403a0d13": "requin",
-    "dd654cd65c06f57a": "faucon",
-    "fb28eef1d26c76ef": "cerf",
-    "d25b4fcd736eeaba": "tortue"
+  "codes_eleves": {
+    "61b077214e9a5d99086c314a325227a3": "renard",
+    "ef9f4c217e7e7650a57a33d55ee04560": "renard",
+    "bf7282c4e9a88f0cb1cde05a92e24d7c": "hibou",
+    "205176eb921f19042aeb673303a40a14": "hibou",
+    "bf7e3c5b2883d072b79212de545fb122": "ours",
+    "af538aeb30cd8b8e1b6b917dc9414489": "ours",
+    "c6ba13431c3ab19ddcbd8361eb426a9f": "requin",
+    "97dcc4faf133041d430141ec4db8677a": "requin",
+    "dd1d8fb1db2910b24e5021de593a2d82": "faucon",
+    "8ab53661e9384b0323934db5b8ce9759": "faucon",
+    "e90bdec00513bdef6347d68b61ca2368": "cerf",
+    "e67448623ac8521879393b4d159587f4": "cerf",
+    "e5af8edd2545cf3e7bce4e14e5e0df2d": "tortue",
+    "28db1c98727039869535fd5459b087da": "tortue"
   },
+  "kdf": {
+    "algo": "PBKDF2-SHA256",
+    "iterations": 100000,
+    "sel": "msdgn2|",
+    "longueur_octets": 16
+  },
+  "contact_resultats": "",
+  "conservation_jusqu_au": "",
   "codes_seance": [
     {
       "date": "2026-11-20",
