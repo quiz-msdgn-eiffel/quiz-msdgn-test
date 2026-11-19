@@ -201,14 +201,6 @@
   .shake{animation:shake .35s;}
   @keyframes shake{25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
   @media (prefers-reduced-motion: reduce){ .glow,.shake{animation:none !important;} }
-
-  #fx-canvas{position:fixed; left:0; top:0; z-index:190; pointer-events:none;}
-  .fx-flash{position:fixed; inset:0; z-index:191; pointer-events:none;}
-  .fx-big{position:fixed; left:50%; top:38%; z-index:230; pointer-events:none; font-weight:900; font-size:2.6rem; letter-spacing:.02em; text-align:center; width:96vw; text-shadow:0 3px 0 rgba(0,0,0,.35), 0 0 22px rgba(0,0,0,.45); transform:translate(-50%,-50%);}
-  #fx-glow{position:fixed; left:0; right:0; bottom:0; height:42vh; z-index:5; pointer-events:none; opacity:0; transition:opacity .6s; background:linear-gradient(to top, rgba(255,120,0,.75), rgba(255,170,0,.25) 45%, transparent);}
-  #fx-glow.warm{background:linear-gradient(to top, rgba(255,70,0,.8), rgba(255,140,0,.3) 45%, transparent);}
-  #fx-glow.hot{background:linear-gradient(to top, rgba(255,20,100,.85), rgba(255,90,0,.35) 45%, transparent);}
-  @media (prefers-reduced-motion: reduce){ #fx-glow{display:none;} }
 </style>
 </head>
 <body>
@@ -261,7 +253,6 @@
     <div class="ludic-buttons">
       <button class="btn-secondary hidden" id="btn-rank" type="button">🏆 Classement des équipes</button>
       <button class="btn-secondary hidden" id="btn-rules" type="button">📖 Règles du challenge</button>
-      <button class="btn-secondary hidden" id="btn-fx" type="button">✨ Effets : Arcade</button>
       <button class="btn-secondary" id="btn-sound" type="button">🔇 Son : coupé</button>
       <button class="btn-ghost" id="btn-info" type="button">Données et vie privée</button>
       <button class="btn-secondary hidden" id="btn-test" type="button">🧪 Mode test</button>
@@ -1717,7 +1708,7 @@ const L = (function(){
   const DEFAULT_CFG = {
     schema:1, phase:'base', version_application:APP_VERSION, version_banque:BANK_VERSION, bareme_version:'B1', mis_a_jour_le:'', valide_jusqu_au:'',
     bareme:{points_par_format:{QCM:10,VF:10,TROUS:12,QCM_MULTI:15,ASSO:15}, plafond_quotidien_bonnes_reponses:15, plafond_hebdo_points:450, bonus_serie:{'3':5,'5':10,'10':20}, seuil_actif:{bonnes_reponses:20,jours_distincts:2}, defi_du_jour:10},
-    equipes:[], codes_equipe:{}, codes_seance:[], challenge_fin:'', effets_force:''
+    equipes:[], codes_equipe:{}, codes_seance:[], challenge_fin:''
   };
   const LEVELS = [0,50,150,300,500,800,1200,1700,2300,3000];
   const BADGES = {
@@ -1860,7 +1851,6 @@ const L = (function(){
   const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function toast(html, ms){
     let z = $('toast-zone'); if(!z){ z = document.createElement('div'); z.id = 'toast-zone'; document.body.appendChild(z); }
-    while(z.children.length >= 2) z.firstChild.remove();
     const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = html; z.appendChild(t);
     setTimeout(() => t.remove(), ms || 2800);
   }
@@ -1895,115 +1885,26 @@ const L = (function(){
     const sp = ST.sessPts[session.sid] || 0;
     $('hud-streak').textContent = 'Séance : +' + sp + ' pt · série ' + (ST.sc.streak.sid === session.sid ? ST.sc.streak.n : 0);
   }
-  /* ---------- moteur d'effets « Arcade » (canvas plein écran) ---------- */
-  const FXL = ['calme','arcade','max'];
-  function fxLevel(){
-    if(reduced()) return 'calme';
-    if(CFG.effets_force && FXL.indexOf(CFG.effets_force) >= 0) return CFG.effets_force;
-    try{ const v = localStorage.getItem('x:fx'); if(FXL.indexOf(v) >= 0) return v; }catch(e){}
-    return 'arcade';
-  }
-  const fxMult = () => ({calme:0.35, arcade:1, max:1.7})[fxLevel()];
-  const PAL = ['#FF3B30','#FF9500','#FFD60A','#34C759','#00C7BE','#0A84FF','#BF5AF2','#FF2D92'];
-  let cv = null, cx = null, parts = [], raf = 0, lastT = 0, W = 0, H = 0, dpr = 1, lastFlash = 0;
-  function cvResize(){ dpr = Math.min(window.devicePixelRatio || 1, 1.5); W = window.innerWidth; H = window.innerHeight; cv.width = W*dpr; cv.height = H*dpr; cv.style.width = W+'px'; cv.style.height = H+'px'; }
-  function cvInit(){ if(cv) return; cv = document.createElement('canvas'); cv.id = 'fx-canvas'; document.body.appendChild(cv); cx = cv.getContext('2d'); cvResize(); window.addEventListener('resize', cvResize); }
-  function teamCols(){ const t = teamObj(teamId(identity().grp)); return t ? [t.couleur, '#ffffff'].concat(PAL) : PAL; }
-  function burst(x, y, n, cols, power){
-    if(reduced()) return; cvInit();
-    n = Math.round(n * fxMult());
-    for(let i=0; i<n && parts.length < 280; i++){
-      const a = Math.random()*Math.PI*2, sp = (0.35 + Math.random()) * power;
-      parts.push({x:x, y:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:0, ttl:650 + Math.random()*750, c:cols[(Math.random()*cols.length)|0], r:2 + Math.random()*3});
-    }
-    if(!raf){ lastT = performance.now(); raf = requestAnimationFrame(loop); }
-  }
-  function loop(t){
-    const dt = Math.min(40, t - lastT); lastT = t; const k = dt/16.7;
-    cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,W,H);
-    parts = parts.filter(p => p.life < p.ttl);
-    parts.forEach(p => {
-      p.life += dt; const px = p.x, py = p.y;
-      p.vx *= 0.985; p.vy = p.vy*0.985 + 0.12*k; p.x += p.vx*k; p.y += p.vy*k;
-      const a = Math.max(0, 1 - p.life/p.ttl);
-      cx.globalAlpha = a; cx.strokeStyle = p.c; cx.fillStyle = p.c; cx.lineWidth = p.r; cx.lineCap = 'round';
-      cx.beginPath(); cx.moveTo(px, py); cx.lineTo(p.x, p.y); cx.stroke();
-      cx.beginPath(); cx.arc(p.x, p.y, p.r*0.7*a + 0.5, 0, 7); cx.fill();
-    });
-    cx.globalAlpha = 1;
-    if(parts.length){ raf = requestAnimationFrame(loop); } else { raf = 0; cx.clearRect(0,0,W,H); }
-  }
-  function fireworks(n, gap){
-    if(reduced()) return; cvInit();
-    const m = Math.max(1, Math.round(n * ({calme:0.4, arcade:1, max:1.5})[fxLevel()]));
-    for(let i=0; i<m; i++) setTimeout(() => {
-      const c1 = PAL[(Math.random()*PAL.length)|0], c2 = PAL[(Math.random()*PAL.length)|0];
-      burst(W*(0.12 + Math.random()*0.76), H*(0.12 + Math.random()*0.55), 80, [c1, c2, '#ffffff'], 6.5);
-      boom();
-    }, i * (gap || 150));
-  }
-  function flash(color){
-    if(reduced() || fxLevel() === 'calme' || Date.now() - lastFlash < 1200) return; lastFlash = Date.now();
-    const d = document.createElement('div'); d.className = 'fx-flash'; d.style.background = color; document.body.appendChild(d);
-    const a = d.animate([{opacity:0.22},{opacity:0}], {duration:450, easing:'ease-out'}); a.onfinish = () => d.remove();
-  }
-  function bigText(txt, color){
-    if(reduced()) return;
-    document.querySelectorAll('.fx-big').forEach(e => e.remove());
-    const d = document.createElement('div'); d.className = 'fx-big'; d.textContent = txt; d.style.color = color || '#fff'; document.body.appendChild(d);
-    const a = d.animate([{transform:'translate(-50%,-50%) scale(0.3)', opacity:0},{transform:'translate(-50%,-50%) scale(1.25)', opacity:1, offset:0.3},{transform:'translate(-50%,-50%) scale(1)', opacity:1, offset:0.7},{transform:'translate(-50%,-60%) scale(1.05)', opacity:0}], {duration:1300, easing:'ease-out'});
-    a.onfinish = () => d.remove();
-  }
-  function glowSet(streak){
-    let g = $('fx-glow'); if(!g){ g = document.createElement('div'); g.id = 'fx-glow'; document.body.appendChild(g); }
-    const on = fxLevel() !== 'calme' && !reduced() && session && session.phase === 'ludique' && streak >= 3;
-    g.style.opacity = on ? (streak >= 10 ? 0.5 : streak >= 5 ? 0.4 : 0.25) : 0;
-    g.className = streak >= 10 ? 'hot' : streak >= 5 ? 'warm' : '';
-  }
-  function boom(){
-    if(!soundOn) return;
-    try{
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      const n = actx.sampleRate*0.25, buf = actx.createBuffer(1, n, actx.sampleRate), d = buf.getChannelData(0);
-      for(let i=0;i<n;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/n, 3);
-      const s = actx.createBufferSource(), g = actx.createGain(); g.gain.value = 0.12; s.buffer = buf; s.connect(g); g.connect(actx.destination); s.start();
-    }catch(e){}
-  }
-  function arpeggio(notes){ notes.forEach((f, i) => setTimeout(() => beep(f, 0.11), i*90)); }
-  function vibrate(ms){ try{ if(navigator.vibrate && !reduced()) navigator.vibrate(ms); }catch(e){} }
-
   function fx(res){
     if(!session || session.phase !== 'ludique' || !res) return;
-    const lv = fxLevel(), zone = $('answer-zone');
-    const r = $('btn-next').getBoundingClientRect(), ox = r.left + r.width/2, oy = Math.max(60, r.top);
-    if(res.correct){
+    const zone = $('answer-zone');
+    const good = res.correct;
+    if(good){
       const fb = zone.querySelector('.feedback.ok'); if(fb) fb.classList.add('glow');
       if(res.points > 0 && !reduced()){
+        const b = $('btn-next').getBoundingClientRect();
         const p = document.createElement('div'); p.className = 'fx-plus'; p.textContent = '+' + res.points;
-        p.style.left = (r.left + 10) + 'px'; p.style.top = (r.top - 6) + 'px'; document.body.appendChild(p);
-        const a = p.animate([{transform:'translateY(0) scale(0.6)', opacity:1},{transform:'translateY(-30px) scale(1.4)', opacity:1, offset:0.3},{transform:'translateY(-80px) scale(1)', opacity:0}], {duration:1200, easing:'ease-out'}); a.onfinish = () => p.remove();
+        p.style.left = (b.left + 10) + 'px'; p.style.top = (b.top - 6) + 'px'; document.body.appendChild(p);
+        const a = p.animate([{transform:'translateY(0)', opacity:1},{transform:'translateY(-46px)', opacity:0}], {duration:1100, easing:'ease-out'}); a.onfinish = () => p.remove();
       }
-      burst(ox, oy, res.points > 0 ? 70 : 28, teamCols(), 6);
-      if(res.points > 0){
-        if(lv === 'arcade') fireworks(1); else if(lv === 'max') fireworks(2, 120);
-        arpeggio([660, 880]); vibrate(25);
-      } else beep(520, 0.08);
-      const st = res.streak;
-      if(lv !== 'calme' && res.points > 0 && st >= 3){
-        bigText('x' + st + ' COMBO', st >= 10 ? '#FFD60A' : st >= 5 ? '#FF9500' : '#ffffff');
-        if(st === 3) fireworks(2);
-        if(st === 5){ fireworks(4); flash('#FF9500'); arpeggio([660, 880, 990]); }
-        if(st === 10){ fireworks(8, 130); flash('#FFD60A'); setTimeout(() => bigText('INARRÊTABLE', '#FF2D92'), 700); arpeggio([660, 880, 990, 1320]); vibrate(120); }
-      }
-      if(res.bonus > 0) toast('🔥 Série de ' + st + ' ! <b>+' + res.bonus + ' pts</b> bonus');
-      if(res.levelUp){ toast('⭐ Niveau <b>' + (res.level+1) + '</b> atteint'); fireworks(6, 120); flash('#BF5AF2'); setTimeout(() => bigText('NIVEAU ' + (res.level+1), '#FFD60A'), 400); arpeggio([523, 659, 784, 1047]); }
-      res.newBadges.forEach(id => { toast(BADGES[id].i + ' Badge : <b>' + BADGES[id].n + '</b>'); fireworks(3); });
-      if(res.dayDone){ toast('🎯 <b>Défi du jour réussi</b> !'); fireworks(6, 120); setTimeout(() => bigText('DÉFI RÉUSSI', '#34C759'), 300); }
-      glowSet(st);
+      beep(660, 0.12);
+      if(res.bonus > 0) toast('🔥 Série de ' + res.streak + ' ! <b>+' + res.bonus + ' pts</b> bonus');
+      if(res.levelUp) { toast('⭐ Niveau <b>' + (res.level+1) + '</b> atteint'); beep(880, 0.25); }
+      res.newBadges.forEach(id => toast(BADGES[id].i + ' Badge : <b>' + BADGES[id].n + '</b>'));
+      if(res.dayDone) toast('🎯 <b>Défi du jour réussi</b> !');
     } else {
       if(!reduced()){ const qc = $('question-container'); qc.classList.remove('shake'); void qc.offsetWidth; qc.classList.add('shake'); }
-      burst(ox, oy, 26, ['#FF3B30','#FF9500','#ffffff'], 4);
-      vibrate(70); beep(220, 0.15); glowSet(0);
+      beep(220, 0.15);
     }
     hudUpdate();
   }
@@ -2059,8 +1960,6 @@ const L = (function(){
     $('btn-test').classList.toggle('hidden', !ADMIN);
     $('btn-rank').classList.toggle('hidden', !isLud());
     $('btn-rules').classList.toggle('hidden', !isLud());
-    $('btn-fx').classList.toggle('hidden', !isLud() || !!(CFG.effets_force && FXL.indexOf(CFG.effets_force) >= 0));
-    $('btn-fx').textContent = '✨ Effets : ' + ({calme:'Calme', arcade:'Arcade', max:'Max'})[fxLevel()];
     $('btn-sound').textContent = soundOn ? '🔊 Son : activé' : '🔇 Son : coupé';
     $('phase-line').textContent = 'Phase : ' + effPhase() + ' · v' + APP_VERSION + (isStale() ? ' · configuration périmée' : '') + (T.on ? ' · TEST' : '');
   }
@@ -2107,7 +2006,6 @@ const L = (function(){
     const a = new Uint8Array(6); crypto.getRandomValues(a);
     s.sid = Array.from(a).map(b => ('0'+b.toString(16)).slice(-2)).join('');
     s.eleve = idt.eleve; s.equipe = teamId(idt.grp); s.ctx = idt.ctx;
-    glowSet(0);
     s.phase = effPhase(); s.stale = isStale(); s.debut = isoLocal(nowD()); s.tent = {};
     rebuild_if_needed();
     hudUpdate();
@@ -2117,7 +2015,7 @@ const L = (function(){
 
   /* ---------- fin de séance ---------- */
   function setupEnd(){
-    closeSessionRows(); glowSet(0);
+    closeSessionRows();
     $('btn-download').textContent = '📤 Envoyer mes résultats';
     $('btn-download').onclick = sendResults;
     $('download-note').textContent = 'Fichier : ' + fileName();
@@ -2238,7 +2136,6 @@ const L = (function(){
     $('btn-info-back').onclick = () => show('screen-start');
     $('btn-erase').onclick = eraseAll;
     $('btn-sound').onclick = () => { soundOn = !soundOn; try{ localStorage.setItem('x:sound', soundOn?'1':'0'); }catch(e){} applyChrome(); beep(660, 0.1); };
-    $('btn-fx').onclick = () => { const l = fxLevel(), n = FXL[(FXL.indexOf(l)+1) % 3]; try{ localStorage.setItem('x:fx', n); }catch(e){} applyChrome(); if(n !== 'calme'){ fireworks(2); } };
     $('btn-test').onclick = openTest;
     $('btn-t-save').onclick = applyTest;
     $('btn-t-reset').onclick = resetTest;
