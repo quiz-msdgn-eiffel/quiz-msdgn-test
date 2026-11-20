@@ -121,13 +121,13 @@
     "sel": "msdgn2|",
     "longueur_octets": 16
   },
-  "contact_resultats": "",
-  "conservation_jusqu_au": "",
+  "contact_resultats": "anniethibaut59@gmail.com",
+  "conservation_jusqu_au": "2027-12-31",
   "codes_seance": [
     {
       "date": "2026-11-20",
       "hash": "df06173879592048"
     }
   ],
-  "challenge_fin": "2027-02-05"
+  "challenge_fin": "2027-12-31"
 }
