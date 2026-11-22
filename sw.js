@@ -1,7 +1,7 @@
-// Service worker — Mémo MSDGN v2.1
+// Service worker — Mémo MSDGN v3.0 (univers)
 // Réseau d'abord, cache en secours. config.json et classement.json ne passent PAS
 // par ce service worker : l'application gère elle-même leur copie hors ligne.
-const VERSION = 'msdgn-v21';
+const VERSION = 'msdgn-v30';
 const FILES = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
